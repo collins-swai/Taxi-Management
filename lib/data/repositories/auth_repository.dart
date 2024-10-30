@@ -1,3 +1,4 @@
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/user_model.dart';
@@ -26,7 +27,6 @@ class AuthRepository {
       String password,
       String passwordConfirmation,
       ) async {
-    // Log user information before registration
     print("Registering user with:");
     print("Name: $name");
     print("Email: $email");
@@ -58,8 +58,7 @@ class AuthRepository {
     if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
       final user = User.fromJson(data['user']);
-      final token = data['token'];
-      return AuthResponse(user: user, token: token);
+      return AuthResponse(user: user, token: '');
     } else {
       final errorData = jsonDecode(response.body);
       throw Exception('Registration failed with message: $errorData');

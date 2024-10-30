@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.taxi_system"
+    namespace 'com.example.taxi_system'
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

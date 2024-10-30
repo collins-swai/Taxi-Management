@@ -14,11 +14,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthLogin>(_onAuthLogin);
   }
 
-  Future<void> _onAuthRegister(AuthRegister event,
-      Emitter<AuthState> emit,) async {
+  Future<void> _onAuthRegister(AuthRegister event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      // Assuming register returns an AuthResponse containing the User
       final authResponse = await authUseCases.register(
         event.name,
         event.email,
@@ -27,30 +25,42 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.confirmPassword,
       );
 
-      // Extract the User and Token from AuthResponse
-      final user = authResponse!.user; // Ensure `user` exists in AuthResponse
-      final token = authResponse.token; // Ensure `token` exists in AuthResponse
+      print('Auth Response: $authResponse');
 
-      emit(AuthSuccess(user: user, token: token));
-    } catch (_) {
+      if (authResponse != null && authResponse.user != null) {
+        final user = authResponse.user;
+
+        emit(AuthSuccesses(user: user));
+        print('Registration successful: ${user.name}');
+      } else {
+        emit(AuthFailure('Registration failed: No user data returned'));
+      }
+    } catch (error) {
+      print('Registration Error: $error');
       emit(AuthFailure('Registration failed'));
     }
   }
 
-  Future<void> _onAuthLogin(AuthLogin event,
-      Emitter<AuthState> emit,) async {
+  Future<void> _onAuthLogin(AuthLogin event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      // Assuming login returns an AuthResponse containing the User
       final authResponse = await authUseCases.login(
           event.emailOrPhone, event.password);
 
-      // Extract the User and Token from AuthResponse
-      final user = authResponse!.user; // Ensure `user` exists in AuthResponse
-      final token = authResponse.token; // Ensure `token` exists in AuthResponse
+      print('Login Response: $authResponse');
 
-      emit(AuthSuccess(user: user, token: token));
-    } catch (_) {
+      if (authResponse != null && authResponse.user != null) {
+        final user = authResponse.user;
+        final token = authResponse.token;
+
+        emit(AuthSuccess(user: user, token: token));
+        print('Login successful: ${user.name}');
+      } else {
+        emit(AuthFailure('Login failed: No user data returned'));
+      }
+    } catch (error) {
+      // Log the error for debugging
+      print('Login Error: $error');
       emit(AuthFailure('Login failed'));
     }
   }

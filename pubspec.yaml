@@ -39,8 +39,6 @@ dependencies:
   http: ^1.2.2
   equatable: ^2.0.5
   flutter_secure_storage: ^9.2.2
-  pusher_client: ^2.0.0
-  laravel_flutter_pusher: ^0.0.4
 
 dev_dependencies:
   flutter_test:

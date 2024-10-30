@@ -20,6 +20,15 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState {}
 
+class AuthSuccesses extends AuthState {
+  final User user;
+
+  AuthSuccesses({required this.user});
+
+  @override
+  List<Object> get props => [user];
+}
+
 class AuthSuccess extends AuthState {
   final User user;
   final String token;

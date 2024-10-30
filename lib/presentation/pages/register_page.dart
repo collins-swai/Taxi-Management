@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:taxi_system/presentation/pages/login_page.dart';
 import '../blocs/auth_bloc.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -8,11 +9,13 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -41,158 +44,196 @@ class _RegisterPageState extends State<RegisterPage> {
           child: SingleChildScrollView(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: size.width * 0.08),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Create Your Account',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 40),
-                  _buildTextField(
-                    controller: nameController,
-                    labelText: 'Full Name',
-                    icon: Icons.person,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextField(
-                    controller: emailController,
-                    labelText: 'Email Address',
-                    icon: Icons.email,
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextField(
-                    controller: phoneNumberController,
-                    labelText: 'Phone Number',
-                    icon: Icons.phone,
-                    keyboardType: TextInputType.phone,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextField(
-                    controller: passwordController,
-                    labelText: 'Password',
-                    icon: Icons.lock,
-                    obscureText: _obscurePassword,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Colors.blueAccent,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Create Your Account',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 40),
+                    _buildTextField(
+                      controller: nameController,
+                      labelText: 'Full Name',
+                      icon: Icons.person,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your name.';
+                        }
+                        return null;
                       },
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildTextField(
-                    controller: confirmPasswordController,
-                    labelText: 'Confirm Password',
-                    icon: Icons.lock_outline,
-                    obscureText: _obscureConfirmPassword,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureConfirmPassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Colors.blueAccent,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscureConfirmPassword = !_obscureConfirmPassword;
-                        });
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                      controller: emailController,
+                      labelText: 'Email Address',
+                      icon: Icons.email,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email.';
+                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
+                            .hasMatch(value)) {
+                          return 'Please enter a valid email address.';
+                        }
+                        return null;
                       },
                     ),
-                  ),
-                  const SizedBox(height: 40),
-                  BlocListener<AuthBloc, AuthState>(
-                    listener: (context, state) {
-                      if (state is AuthLoading) {
-                        // Optionally show a loading indicator
-                      } else if (state is AuthFailure) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(state.message),
-                            backgroundColor: Colors.redAccent,
-                          ),
-                        );
-                      } else if (state is AuthSuccess) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Registration successful!'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                        // Navigate to the login page
-                        Navigator.pushReplacementNamed(context, '/login'); // Adjust the route name as needed
-                      }
-                    },
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.blue.shade800,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                      controller: phoneNumberController,
+                      labelText: 'Phone Number',
+                      icon: Icons.phone,
+                      keyboardType: TextInputType.phone,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your phone number.';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                      controller: passwordController,
+                      labelText: 'Password',
+                      icon: Icons.lock,
+                      obscureText: _obscurePassword,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.blueAccent,
                         ),
-                        shadowColor: Colors.black38,
-                        elevation: 6,
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
                       ),
-                      onPressed: () {
-                        final name = nameController.text.trim();
-                        final email = emailController.text.trim();
-                        final phone = phoneNumberController.text.trim();
-                        final password = passwordController.text.trim();
-                        final confirmPassword = confirmPasswordController.text.trim();
-
-                        if (name.isEmpty || email.isEmpty || phone.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your password.';
+                        } else if (value.length < 6) {
+                          return 'Password must be at least 6 characters long.';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    _buildTextField(
+                      controller: confirmPasswordController,
+                      labelText: 'Confirm Password',
+                      icon: Icons.lock_outline,
+                      obscureText: _obscureConfirmPassword,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirmPassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.blueAccent,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscureConfirmPassword = !_obscureConfirmPassword;
+                          });
+                        },
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your password.';
+                        } else if (value != passwordController.text) {
+                          return 'Passwords do not match.';
+                        }
+                        return null;
+                      },
+                    ),
+                    const SizedBox(height: 40),
+                    BlocListener<AuthBloc, AuthState>(
+                      listener: (context, state) {
+                        if (state is AuthLoading) {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => const Center(
+                                child: CircularProgressIndicator()),
+                          );
+                        } else if (state is AuthFailure) {
+                          Navigator.pop(context); // Remove loading dialog
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please fill in all fields.'),
-                              backgroundColor: Colors.orangeAccent,
+                            SnackBar(
+                              content: Text(state.message),
+                              backgroundColor: Colors.redAccent,
                             ),
                           );
-                        } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(email)) {
+                        } else if (state is AuthSuccess) {
+                          // Handle AuthSuccess state if needed
+                          Navigator.pop(context); // Remove loading dialog
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Please enter a valid email address.'),
-                              backgroundColor: Colors.orangeAccent,
+                              content: Text('Registration successful!'),
+                              backgroundColor: Colors.green,
                             ),
                           );
-                        } else if (password != confirmPassword) {
+                          // Navigate to the LoginPage and clear the navigation stack
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            '/login',
+                            (Route<dynamic> route) => false,
+                          );
+                        } else if (state is AuthSuccesses) {
+                          Navigator.pop(context); // Remove loading dialog
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('Passwords do not match.'),
-                              backgroundColor: Colors.orangeAccent,
+                              content: Text('Registration successful!'),
+                              backgroundColor: Colors.green,
                             ),
                           );
-                        } else {
-                          BlocProvider.of<AuthBloc>(context).add(AuthRegister(
-                            name,
-                            email,
-                            phone,
-                            password,
-                            confirmPassword,
-                          ));
-                          BlocProvider.of<AuthBloc>(context).emit(AuthLoading());
+                          // Navigate to the LoginPage and clear the navigation stack
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            '/login',
+                            (Route<dynamic> route) => false,
+                          );
                         }
                       },
-                      child: const Text(
-                        'Register',
-                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          backgroundColor: Colors.blue.shade800,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          shadowColor: Colors.black38,
+                          elevation: 6,
+                        ),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            BlocProvider.of<AuthBloc>(context).add(AuthRegister(
+                              nameController.text.trim(),
+                              emailController.text.trim(),
+                              phoneNumberController.text.trim(),
+                              passwordController.text.trim(),
+                              confirmPasswordController.text.trim(),
+                            ));
+                          }
+                        },
+                        child: const Text(
+                          'Register',
+                          style: TextStyle(fontSize: 18, color: Colors.white),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ),
@@ -208,8 +249,9 @@ class _RegisterPageState extends State<RegisterPage> {
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
     Widget? suffixIcon,
+    String? Function(String?)? validator,
   }) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       decoration: InputDecoration(
         prefixIcon: icon != null ? Icon(icon, color: Colors.blueAccent) : null,
@@ -225,6 +267,7 @@ class _RegisterPageState extends State<RegisterPage> {
       obscureText: obscureText,
       keyboardType: keyboardType,
       style: const TextStyle(color: Colors.white),
+      validator: validator,
     );
   }
 }

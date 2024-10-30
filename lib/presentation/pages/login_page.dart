@@ -116,13 +116,12 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         );
                       } else if (state is AuthSuccess) {
-                        Navigator.of(context).pop(); // Close loading indicator
-                        final token = state.token; // Access the token from User
+                        Navigator.of(context).pop();
+                        final token = state.token;
 
-                        // Store the token securely
                         if (token != null) {
                           await secureStorage.write(key: 'auth_token', value: token);
-                          print('Token stored: $token'); // Confirm storage
+                          print('Token stored: $token');
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -130,7 +129,6 @@ class _LoginPageState extends State<LoginPage> {
                               backgroundColor: Colors.green,
                             ),
                           );
-                          // Navigate to CarListPage
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

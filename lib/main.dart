@@ -1,9 +1,5 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pusher_client/pusher_client.dart';
-import 'package:taxi_system/data/models/car_model.dart';
 import 'presentation/blocs/auth_bloc.dart';
 import 'presentation/blocs/car_bloc.dart';
 import 'data/repositories/auth_repository.dart';
@@ -24,60 +20,21 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late PusherClient pusher;
 
   @override
   void initState() {
     super.initState();
-
-    pusher = PusherClient(
-      'b3baa847b08be8b76de1',
-      PusherOptions(cluster: 'ap2'),
-      enableLogging: true,
-    );
-
-    pusher.connect();
-    _subscribeToChannels();
-  }
-
-  void _subscribeToChannels() {
-    var channel = pusher.subscribe('car-channel');
-
-    channel.bind('CarAdded', (PusherEvent? event) {
-      if (event != null && event.data != null) {
-        final data = json.decode(event.data!) as Map<String, dynamic>;
-        final car = Car.fromJson(data);
-        BlocProvider.of<CarBloc>(context).handleRealTimeCarAdded(car);
-      }
-    });
-
-    channel.bind('CarUpdated', (PusherEvent? event) {
-      if (event != null && event.data != null) {
-        final data = json.decode(event.data!) as Map<String, dynamic>;
-        final car = Car.fromJson(data);
-        BlocProvider.of<CarBloc>(context).handleRealTimeCarUpdated(car);
-      }
-    });
-
-    channel.bind('CarDeleted', (PusherEvent? event) {
-      if (event != null && event.data != null) {
-        final data = json.decode(event.data!) as Map<String, dynamic>;
-        final carId = data['id'] as String;
-        BlocProvider.of<CarBloc>(context).handleRealTimeCarDeleted(carId);
-      }
-    });
   }
 
 
   @override
   void dispose() {
-    pusher.disconnect();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final String baseUrl = 'https://131a-80-240-201-164.ngrok-free.app';
+    final String baseUrl = 'https://d307-80-240-201-165.ngrok-free.app';
 
     final authRepository = AuthRepository(baseUrl);
     final authUseCases = AuthUseCases(authRepository);
